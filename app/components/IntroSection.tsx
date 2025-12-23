@@ -2,9 +2,11 @@
 
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import CategoryGallery from './CategoryGallery';
 
 export default function IntroSection() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -52,7 +54,26 @@ export default function IntroSection() {
           animate={isLoaded ? { opacity: 1 } : {}}
           transition={{ duration: 1, delay: 0.8 }}
         >
-          그래픽 디자인 · 일러스트레이션 · 순수 미술
+          <button
+            onClick={() => setSelectedCategory('Graphic Design')}
+            className="transition-colors hover:text-white underline decoration-2 underline-offset-4"
+          >
+            그래픽 디자인
+          </button>
+          {' · '}
+          <button
+            onClick={() => setSelectedCategory('Illustration')}
+            className="transition-colors hover:text-white underline decoration-2 underline-offset-4"
+          >
+            일러스트레이션
+          </button>
+          {' · '}
+          <button
+            onClick={() => setSelectedCategory('Fine Art')}
+            className="transition-colors hover:text-white underline decoration-2 underline-offset-4"
+          >
+            순수 미술
+          </button>
         </motion.p>
       </motion.div>
 
@@ -69,6 +90,15 @@ export default function IntroSection() {
           transition={{ duration: 1.5, repeat: Infinity }}
         />
       </motion.div>
+
+      {/* 카테고리 갤러리 */}
+      {selectedCategory && (
+        <CategoryGallery
+          category={selectedCategory}
+          isOpen={!!selectedCategory}
+          onClose={() => setSelectedCategory(null)}
+        />
+      )}
     </section>
   );
 }

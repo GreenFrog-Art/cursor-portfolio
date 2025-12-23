@@ -1,8 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import CategoryGallery from './CategoryGallery';
 
 export default function AboutSection() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   return (
     <section className="relative flex min-h-screen w-screen flex-shrink-0 items-center justify-center bg-black px-8 py-20">
       <div className="container mx-auto max-w-4xl">
@@ -30,9 +33,29 @@ export default function AboutSection() {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <p>
-              예술은 경계를 넘어서는 언어입니다. 그래픽 디자인, 일러스트레이션,
-              순수 미술의 경계를 자유롭게 넘나들며, 각 매체의 고유한 특성을
-              탐구하고 융합합니다.
+              예술은 경계를 넘어서는 언어입니다.{' '}
+              <button
+                onClick={() => setSelectedCategory('Graphic Design')}
+                className="font-semibold text-white underline decoration-2 underline-offset-4 transition-colors hover:text-gray-300"
+              >
+                그래픽 디자인
+              </button>
+              ,{' '}
+              <button
+                onClick={() => setSelectedCategory('Illustration')}
+                className="font-semibold text-white underline decoration-2 underline-offset-4 transition-colors hover:text-gray-300"
+              >
+                일러스트레이션
+              </button>
+              ,{' '}
+              <button
+                onClick={() => setSelectedCategory('Fine Art')}
+                className="font-semibold text-white underline decoration-2 underline-offset-4 transition-colors hover:text-gray-300"
+              >
+                순수 미술
+              </button>
+              의 경계를 자유롭게 넘나들며, 각 매체의 고유한 특성을 탐구하고
+              융합합니다.
             </p>
 
             <p>
@@ -70,6 +93,15 @@ export default function AboutSection() {
           </motion.div>
         </motion.div>
       </div>
+
+      {/* 카테고리 갤러리 */}
+      {selectedCategory && (
+        <CategoryGallery
+          category={selectedCategory}
+          isOpen={!!selectedCategory}
+          onClose={() => setSelectedCategory(null)}
+        />
+      )}
     </section>
   );
 }

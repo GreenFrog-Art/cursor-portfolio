@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useArtworks, Artwork } from '../hooks/useArtworks';
 import ArtworkForm from './ArtworkForm';
+import { normalizeImagePath } from '../utils/imageUtils';
 
 export default function AdminPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingArtwork, setEditingArtwork] = useState<Artwork | undefined>();
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const { artworks, addArtwork, updateArtwork, deleteArtwork, resetArtworks } =
     useArtworks();
 
@@ -152,12 +154,49 @@ export default function AdminPanel() {
                       animate={{ opacity: 1, y: 0 }}
                     >
                       {/* 이미지 미리보기 */}
-                      <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-700">
-                        <img
-                          src={artwork.image}
-                          alt={artwork.title}
-                          className="h-full w-full object-cover"
-                        />
+                      <div
+                        className="relative w-full overflow-hidden bg-gray-700"
+                        style={{
+                          aspectRatio: `${artwork.width} / ${artwork.height}`,
+                        }}
+                      >
+                        {imageErrors.has(artwork.id) ? (
+                          <div className="flex h-full w-full items-center justify-center bg-gray-800">
+                            <div className="text-center text-gray-500">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="mx-auto h-8 w-8"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008H12.75V8.25Zm0 2.25h.008v.008H12.75v-.008Z"
+                                />
+                              </svg>
+                              <p className="mt-1 text-xs">이미지 없음</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <img
+                            src={normalizeImagePath(artwork.image)}
+                            alt={artwork.title}
+                            className="h-full w-full object-cover"
+                            onError={() => {
+                              setImageErrors((prev) => new Set(prev).add(artwork.id));
+                            }}
+                            onLoad={() => {
+                              setImageErrors((prev) => {
+                                const newSet = new Set(prev);
+                                newSet.delete(artwork.id);
+                                return newSet;
+                              });
+                            }}
+                          />
+                        )}
                       </div>
 
                       {/* 정보 */}

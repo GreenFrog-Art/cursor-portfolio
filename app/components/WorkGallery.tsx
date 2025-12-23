@@ -3,10 +3,14 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useArtworks } from '../hooks/useArtworks';
+import { normalizeImagePath } from '../utils/imageUtils';
+import CategoryGallery from './CategoryGallery';
 
 export default function WorkGallery() {
   const { artworks, isLoading } = useArtworks();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -53,7 +57,10 @@ export default function WorkGallery() {
               data-hover
             >
               <motion.div
-                className="relative aspect-[3/4] w-full overflow-hidden bg-gray-800"
+                className="relative w-full overflow-hidden bg-gray-800"
+                style={{
+                  aspectRatio: `${artwork.width} / ${artwork.height}`,
+                }}
                 whileHover={{ scale: 1.05, rotate: hoveredId === artwork.id ? 1 : 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
               >
@@ -72,24 +79,45 @@ export default function WorkGallery() {
                       : 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
                   }}
                 >
-                  {/* 실제 이미지를 사용하려면 public 폴더에 이미지를 추가하고 경로를 수정하세요 */}
-                  <div
-                    className="h-full w-full bg-gradient-to-br from-purple-500/30 to-blue-500/30"
-                    style={{
-                      backgroundImage: `url(${artwork.image})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
-                  >
-                    {/* 실제 Next.js Image 컴포넌트를 사용하려면 아래 주석을 해제하세요 */}
-                    {/* <Image
-                      src={artwork.image}
+                  {/* 이미지 표시 */}
+                  {imageErrors.has(artwork.id) ? (
+                    // 이미지 로드 실패 시 fallback
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500/30 to-blue-500/30">
+                      <div className="text-center text-white/50">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="mx-auto h-12 w-12"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008H12.75V8.25Zm0 2.25h.008v.008H12.75v-.008Z"
+                          />
+                        </svg>
+                        <p className="mt-2 text-xs">이미지를 불러올 수 없습니다</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <img
+                      src={normalizeImagePath(artwork.image)}
                       alt={artwork.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    /> */}
-                  </div>
+                      className="h-full w-full object-cover"
+                      onError={() => {
+                        setImageErrors((prev) => new Set(prev).add(artwork.id));
+                      }}
+                      onLoad={() => {
+                        setImageErrors((prev) => {
+                          const newSet = new Set(prev);
+                          newSet.delete(artwork.id);
+                          return newSet;
+                        });
+                      }}
+                    />
+                  )}
                 </motion.div>
 
                 {/* 오버레이 정보 */}
@@ -101,9 +129,15 @@ export default function WorkGallery() {
                   <h3 className="font-serif text-2xl font-bold text-white">
                     {artwork.title}
                   </h3>
-                  <p className="mt-2 font-sans text-sm text-gray-300">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedCategory(artwork.category);
+                    }}
+                    className="mt-2 font-sans text-sm text-gray-300 transition-colors hover:text-white underline decoration-2 underline-offset-4"
+                  >
                     {artwork.category}
-                  </p>
+                  </button>
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -111,6 +145,15 @@ export default function WorkGallery() {
           </div>
         )}
       </div>
+
+      {/* 카테고리 갤러리 */}
+      {selectedCategory && (
+        <CategoryGallery
+          category={selectedCategory}
+          isOpen={!!selectedCategory}
+          onClose={() => setSelectedCategory(null)}
+        />
+      )}
     </section>
   );
 }
