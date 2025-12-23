@@ -6,6 +6,7 @@ import CustomCursor from './components/CustomCursor';
 import IntroSection from './components/IntroSection';
 import WorkGallery from './components/WorkGallery';
 import AboutSection from './components/AboutSection';
+import AdminPanel from './components/AdminPanel';
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -25,6 +26,7 @@ export default function Home() {
           transition={{ duration: 0.8, ease: 'easeInOut' }}
         >
           <CustomCursor />
+          <AdminPanel />
           <div className="flex h-screen w-full overflow-x-auto overflow-y-hidden bg-black scrollbar-hide">
             <motion.div
               className="flex h-full"

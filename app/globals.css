@@ -17,6 +17,25 @@
   cursor: none !important;
 }
 
+/* 관리자 패널과 폼에서는 기본 커서 사용 */
+[style*="cursor: pointer"],
+[style*="cursor: auto"],
+button,
+input,
+select,
+textarea,
+a {
+  cursor: pointer !important;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"],
+select,
+textarea {
+  cursor: text !important;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

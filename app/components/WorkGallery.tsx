@@ -1,72 +1,22 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { useState } from 'react';
-
-interface Artwork {
-  id: number;
-  title: string;
-  image: string;
-  category: string;
-  width: number;
-  height: number;
-}
-
-// 샘플 작품 데이터 (실제 이미지로 교체하세요)
-const artworks: Artwork[] = [
-  {
-    id: 1,
-    title: 'Abstract Composition',
-    image: '/api/placeholder/600/800',
-    category: 'Graphic Design',
-    width: 600,
-    height: 800,
-  },
-  {
-    id: 2,
-    title: 'Digital Illustration',
-    image: '/api/placeholder/800/600',
-    category: 'Illustration',
-    width: 800,
-    height: 600,
-  },
-  {
-    id: 3,
-    title: 'Mixed Media',
-    image: '/api/placeholder/700/900',
-    category: 'Fine Art',
-    width: 700,
-    height: 900,
-  },
-  {
-    id: 4,
-    title: 'Typography Study',
-    image: '/api/placeholder/900/700',
-    category: 'Graphic Design',
-    width: 900,
-    height: 700,
-  },
-  {
-    id: 5,
-    title: 'Color Exploration',
-    image: '/api/placeholder/600/600',
-    category: 'Fine Art',
-    width: 600,
-    height: 600,
-  },
-  {
-    id: 6,
-    title: 'Character Design',
-    image: '/api/placeholder/800/800',
-    category: 'Illustration',
-    width: 800,
-    height: 800,
-  },
-];
+import { useArtworks } from '../hooks/useArtworks';
 
 export default function WorkGallery() {
-  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const { artworks, isLoading } = useArtworks();
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  if (isLoading) {
+    return (
+      <section className="relative flex h-screen w-screen flex-shrink-0 items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black">
+        <div className="text-center text-white">
+          <p className="font-sans text-lg">로딩 중...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative flex h-screen w-screen flex-shrink-0 items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black px-8 py-20">
@@ -82,8 +32,15 @@ export default function WorkGallery() {
         </motion.h2>
 
         {/* 비정형 그리드 레이아웃 */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {artworks.map((artwork, index) => (
+        {artworks.length === 0 ? (
+          <div className="py-20 text-center">
+            <p className="font-sans text-xl text-gray-400">
+              작품이 없습니다. 관리자 패널에서 작품을 추가해주세요.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {artworks.map((artwork, index) => (
             <motion.div
               key={artwork.id}
               className="group relative overflow-hidden"
@@ -150,8 +107,9 @@ export default function WorkGallery() {
                 </motion.div>
               </motion.div>
             </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
