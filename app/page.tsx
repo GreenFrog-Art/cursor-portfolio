@@ -27,7 +27,7 @@ export default function Home() {
         >
           <CustomCursor />
           <AdminPanel />
-          <div className="flex h-screen w-full overflow-x-auto overflow-y-hidden bg-black scrollbar-hide">
+          <div className="flex h-screen w-full overflow-x-auto overflow-y-hidden bg-[#0a0a0a] scrollbar-hide">
             <motion.div
               className="flex h-full"
               initial={{ opacity: 0, x: 50 }}

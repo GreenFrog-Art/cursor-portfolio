@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #ededed;
+  --background: #0a0a0a;
+  --foreground: #e8e5e0;
+  --vintage-cream: #f5f1e8;
+  --vintage-beige: #d4c5b9;
+  --vintage-brown: #8b7355;
 }
 
 @theme inline {
@@ -41,24 +44,69 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   overflow-x: hidden;
+  position: relative;
 }
 
-/* 커스텀 스크롤바 스타일 */
+/* 빈티지 필름 그레인 효과 - 강화 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.08) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.05) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.05) 3px
+    );
+  opacity: 0.7;
+  mix-blend-mode: overlay;
+}
+
+/* 빈티지 노이즈 텍스처 */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+}
+
+/* 커스텀 스크롤바 스타일 - 빈티지 */
 ::-webkit-scrollbar {
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #1a1a1a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ffffff;
+  background: #8b7355;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #cccccc;
+  background: #a68b6f;
 }
 
 /* 세리프체 클래스 */
@@ -79,4 +127,65 @@ html {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* 입체적인 3D 텍스트 효과 */
+.text-3d {
+  text-shadow: 
+    1px 1px 0 rgba(0, 0, 0, 0.8),
+    2px 2px 0 rgba(0, 0, 0, 0.7),
+    3px 3px 0 rgba(0, 0, 0, 0.6),
+    4px 4px 0 rgba(0, 0, 0, 0.5),
+    5px 5px 0 rgba(0, 0, 0, 0.4),
+    6px 6px 10px rgba(0, 0, 0, 0.8),
+    8px 8px 20px rgba(139, 115, 85, 0.6),
+    0 0 30px rgba(212, 197, 180, 0.3);
+  transform: perspective(1000px) rotateX(2deg);
+  transform-style: preserve-3d;
+  line-height: 1;
+}
+
+.text-3d-strong {
+  text-shadow: 
+    1px 1px 0 rgba(0, 0, 0, 0.9),
+    2px 2px 0 rgba(0, 0, 0, 0.8),
+    3px 3px 0 rgba(0, 0, 0, 0.7),
+    4px 4px 0 rgba(0, 0, 0, 0.6),
+    5px 5px 0 rgba(0, 0, 0, 0.5),
+    6px 6px 0 rgba(0, 0, 0, 0.4),
+    7px 7px 0 rgba(0, 0, 0, 0.3),
+    8px 8px 15px rgba(0, 0, 0, 0.9),
+    10px 10px 25px rgba(139, 115, 85, 0.7),
+    0 0 40px rgba(212, 197, 180, 0.4);
+  transform: perspective(1000px) rotateX(3deg);
+  transform-style: preserve-3d;
+  letter-spacing: 0.05em;
+  line-height: 0.95;
+}
+
+/* 그라데이션 텍스트 */
+.text-gradient-vintage {
+  background: linear-gradient(135deg, #e8e5e0 0%, #d4c5b9 50%, #e8e5e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 빈티지 빈팅 효과 */
+.vintage-vignette {
+  position: relative;
+}
+
+.vintage-vignette::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  z-index: 1;
 }

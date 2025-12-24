@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useArtworks } from '../hooks/useArtworks';
-import { normalizeImagePath } from '../utils/imageUtils';
+import { normalizeImagePath, isUploadedImage } from '../utils/imageUtils';
 import CategoryGallery from './CategoryGallery';
 
 export default function WorkGallery() {
@@ -14,37 +14,48 @@ export default function WorkGallery() {
 
   if (isLoading) {
     return (
-      <section className="relative flex h-screen w-screen flex-shrink-0 items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black">
-        <div className="text-center text-white">
+      <section className="relative flex h-screen w-screen flex-shrink-0 items-center justify-center bg-gradient-to-b from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a]">
+        <div className="text-center text-[#e8e5e0]">
           <p className="font-sans text-lg">로딩 중...</p>
         </div>
       </section>
     );
   }
 
+  // 실제로 업로드된 이미지이고, 이미지 로드에 성공한 작품만 필터링
+  const filteredArtworks = artworks.filter(
+    (artwork) =>
+      isUploadedImage(artwork.image) && !imageErrors.has(artwork.id)
+  );
+
   return (
-    <section className="relative flex h-screen w-screen flex-shrink-0 items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black px-8 py-20">
+    <section className="relative flex h-screen w-screen flex-shrink-0 items-center justify-center bg-gradient-to-b from-[#0a0a0a] via-[#1a0f0a] to-[#0a0a0a] px-8 py-20">
       <div className="container mx-auto">
         <motion.h2
-          className="mb-16 font-serif text-5xl font-bold text-white md:text-6xl lg:text-7xl"
+          className="mb-16 font-serif text-5xl font-black text-gradient-vintage text-3d-strong md:text-6xl lg:text-7xl tracking-wider"
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
+          style={{
+            filter: 'sepia(0.15) saturate(1.1)',
+            transform: 'perspective(1000px) rotateX(2deg)',
+            transformStyle: 'preserve-3d',
+          }}
         >
           WORK GALLERY
         </motion.h2>
 
         {/* 비정형 그리드 레이아웃 */}
-        {artworks.length === 0 ? (
+        {filteredArtworks.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="font-sans text-xl text-gray-400">
+            <p className="font-sans text-xl text-[#d4c5b9]">
               작품이 없습니다. 관리자 패널에서 작품을 추가해주세요.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {artworks.map((artwork, index) => (
+            {filteredArtworks.map((artwork, index) => (
             <motion.div
               key={artwork.id}
               className="group relative overflow-hidden"
@@ -57,27 +68,22 @@ export default function WorkGallery() {
               data-hover
             >
               <motion.div
-                className="relative w-full overflow-hidden bg-gray-800"
+                className="relative w-full overflow-hidden bg-[#1a0f0a] shadow-[0_8px_30px_rgba(139,115,85,0.4),inset_0_0_0_1px_rgba(212,197,180,0.1)]"
                 style={{
                   aspectRatio: `${artwork.width} / ${artwork.height}`,
                 }}
-                whileHover={{ scale: 1.05, rotate: hoveredId === artwork.id ? 1 : 0 }}
+                whileHover={{ scale: 1.02, rotate: hoveredId === artwork.id ? 0.5 : 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
               >
                 <motion.div
                   animate={{
-                    scale: hoveredId === artwork.id ? 1.15 : 1,
+                    scale: hoveredId === artwork.id ? 1.05 : 1,
                     filter: hoveredId === artwork.id
-                      ? 'brightness(1.2) saturate(1.3) contrast(1.1)'
-                      : 'brightness(1) saturate(1) contrast(1)',
+                      ? 'brightness(1.15) saturate(1.2) contrast(1.1) sepia(0.25) hue-rotate(-5deg)'
+                      : 'brightness(0.95) saturate(0.9) contrast(1.05) sepia(0.2) hue-rotate(-8deg)',
                   }}
                   transition={{ duration: 0.4, ease: 'easeOut' }}
                   className="h-full w-full"
-                  style={{
-                    transform: hoveredId === artwork.id
-                      ? 'perspective(1000px) rotateX(2deg) rotateY(-2deg)'
-                      : 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
-                  }}
                 >
                   {/* 이미지 표시 */}
                   {imageErrors.has(artwork.id) ? (
@@ -122,11 +128,11 @@ export default function WorkGallery() {
 
                 {/* 오버레이 정보 */}
                 <motion.div
-                  className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100"
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a]/85 backdrop-blur-sm opacity-0 transition-opacity group-hover:opacity-100 border border-[#d4c5b9]/20"
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 1 }}
                 >
-                  <h3 className="font-serif text-2xl font-bold text-white">
+                  <h3 className="font-serif text-2xl font-bold text-[#e8e5e0] [text-shadow:2px_2px_8px_rgba(0,0,0,0.8)]">
                     {artwork.title}
                   </h3>
                   <button
@@ -134,7 +140,7 @@ export default function WorkGallery() {
                       e.stopPropagation();
                       setSelectedCategory(artwork.category);
                     }}
-                    className="mt-2 font-sans text-sm text-gray-300 transition-colors hover:text-white underline decoration-2 underline-offset-4"
+                    className="mt-2 font-sans text-sm text-[#d4c5b9] transition-all hover:text-[#e8e5e0] hover:scale-105 underline decoration-[#8b7355] decoration-2 underline-offset-4 [text-shadow:1px_1px_4px_rgba(0,0,0,0.5)]"
                   >
                     {artwork.category}
                   </button>
